@@ -1,0 +1,86 @@
+buildscript {
+    repositories {
+        maven { url "http://repo.spring.io/libs-snapshot" }
+        maven { url "http://repo.spring.io/libs-milestone" }
+        mavenLocal()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.5.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'spring-boot'
+apply plugin: 'war'
+apply plugin: 'idea'
+
+configurations {
+    moreLibs
+}
+
+war {
+//    from 'src/main/production' // adds a file-set to the root of the archive
+//    webInf { from 'src/main/production' into 'classes' } // adds a file-set to the WEB-INF dir.
+//    classpath fileTree('src/main/production') // adds a file-set to the WEB-INF/lib dir.
+//    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
+//    webXml = file('src/main/production/web.xml') // copies a file to WEB-INF/web.xml
+}
+processResources {
+    exclude "*.*";
+}
+
+sourceCompatibility = 1.6
+
+repositories {
+    mavenCentral()
+    maven { url "http://repo.spring.io/libs-snapshot" }
+    maven { url "http://repo.spring.io/libs-milestone" }
+}
+
+dependencies {
+    //spring
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile ("org.springframework.boot:spring-boot-starter-data-jpa") {
+        exclude module:'hibernate-entitymanager'
+    }
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile 'org.hibernate:hibernate-entitymanager:4.2.8.Final'
+    compile 'net.sourceforge.jexcelapi:jxl:2.6.12'
+    compile 'org.apache.commons:commons-lang3:3.1'
+    compile 'commons-lang:commons-lang:2.6'
+    compile 'org.jasypt:jasypt-spring31:1.9.2'
+
+    compile files('libs/mariadb-java-client-1.1.6.jar')
+    testCompile(
+            'org.springframework.boot:spring-boot-starter-test',
+            'junit:junit:4.11'
+    )
+    //providedCompile "org.springframework.boot:spring-boot-starter-tomcat"
+    //providedCompile "org.hibernate:hibernate-entitymanager"
+    //moreLibs "org.hibernate:hibernate-entitymanager:4.2.8.Final"
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+copy {
+    from('src/main/resources/templates') {
+        exclude '**/*.html', '**/*.xml'
+    }
+    into 'src/main/resources/static/'
+    exclude '**/*.bak'
+
+    includeEmptyDirs = false
+}
+compileJava.options.encoding = 'UTF-8'
+javadoc {
+    options {
+        locale = 'en_US'
+        encoding = 'UTF-8'
+        docFilesSubDirs = true
+        excludeDocFilesSubDir '.svn'
+        options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PRIVATE
+    }
+}
