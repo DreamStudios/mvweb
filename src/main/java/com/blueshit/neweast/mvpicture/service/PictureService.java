@@ -41,4 +41,18 @@ public interface PictureService {
      * @return
      */
     public boolean updatePictureWeight(int id,String startTime,String endTime,int weight,String hour);
+
+    /**
+     * 根据ID获取图片实体信息
+     * @param id 图片ID
+     * @return
+     */
+    public Picture getPictureById(int id);
+
+    /**
+     * 添加图片
+     * @param picture 图片对象
+     * @return
+     */
+    public boolean addPicture(Picture picture);
 }

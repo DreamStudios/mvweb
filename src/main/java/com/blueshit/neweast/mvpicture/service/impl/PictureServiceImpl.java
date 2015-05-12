@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 图片管理接口实现类
  * @author 9527
@@ -23,6 +27,8 @@ public class PictureServiceImpl implements PictureService {
     private static final Logger logger = LoggerFactory.getLogger(PictureServiceImpl.class);
 
     private PictureRepository pictureRepository;
+    @Autowired
+    public  HttpSession       httpSession;
 
     @Autowired
     public PictureServiceImpl(PictureRepository pictureRepository) {
@@ -86,6 +92,49 @@ public class PictureServiceImpl implements PictureService {
             }catch(Exception ex){
                 return false;
             }
+        }
+        return true;
+    }
+
+    /**
+     * 根据ID获取图片实体信息
+     * @param id 图片ID
+     * @return
+     */
+    public Picture getPictureById(int id){
+        return pictureRepository.findOne(id);
+    }
+
+    /**
+     * 添加图片
+     * @param picture 图片对象
+     * @return
+     */
+    public boolean addPicture(Picture picture){
+        try {
+            picture.setStatus(0);
+            List<Picture> pictures = new ArrayList<Picture>();
+            if (1 == picture.getStyle()) {//自有
+                Object obj = httpSession.getAttribute("pictures");
+                if (null != obj) {
+                    List<String> list = (List<String>) obj;
+                    for (String url : list) {
+                        Picture temp = (Picture) picture.clone();
+                        temp.setUrl(url);
+                        pictures.add(temp);
+                    }
+                }
+            } else {//第三方
+                String urls = picture.getUrl();
+                for(String url : urls.split(",")){
+                    Picture temp = (Picture) picture.clone();
+                    temp.setUrl(url);
+                    pictures.add(temp);
+                }
+            }
+            pictureRepository.save(pictures);
+        }catch (Exception ex){
+            return false;
         }
         return true;
     }

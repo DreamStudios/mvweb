@@ -1,11 +1,16 @@
 package com.blueshit.neweast.mvpicture.controller;
+import com.blueshit.neweast.mvpicture.entity.Picture;
 import com.blueshit.neweast.mvpicture.service.PictureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * 图片管理
@@ -24,7 +29,6 @@ public class PictureController {
     public PictureController(PictureService pictureService) {
         this.pictureService = pictureService;
     }
-
 
     //进入图片管理页面
     @RequestMapping("/admin/pictureManager")
@@ -65,51 +69,37 @@ public class PictureController {
         return "redirect:pictureManager";
     }
 
+    //进入图片添加页面
+    @RequestMapping(value="/admin/pictureAdd", method = RequestMethod.GET)
+    public String pictureAdd(Model model, Integer style, HttpSession session){
+        session.removeAttribute("pictures");
+        Picture picture = new Picture();
+        style = style == null ? 1 : style;
+        picture.setStyle(style);
+        model.addAttribute("picture",picture);
+        System.out.println("------------------");
+        return "admin/pictureAdd";
+    }
 
-
-    /*@RequestMapping(value="/admin/pictureAddOrEdit", method = RequestMethod.GET)
-    public String addGoodsStatusGet(Model model, Integer id, HttpSession session){
-        session.removeAttribute("goodsIcon");
-        Goods goods = null;
-        if(goodsid == null){ //添加
-            goods = new Goods();
-            goods.setGoodsIcon(Constant.DEFAULT_PICTURE);
-            goods.setWeight(10);
-        }else{ //修改
-            goods = goodsService.getGoodsByGoodsId(goodsid);
-            session.setAttribute("goodsIcon",goods.getGoodsIcon()==null?"":goods.getGoodsIcon());
+    //添加图片
+    @RequestMapping(value="/admin/pictureAdd", method = RequestMethod.POST)
+    public String addGoodsStatusPost(@ModelAttribute("picture") Picture picture,BindingResult result, HttpSession session,RedirectAttributes attr){
+        boolean res = pictureService.addPicture(picture);
+        session.removeAttribute("pictures");
+        if(res){
+            attr.addFlashAttribute("res","添加成功");
+        }else {
+            attr.addFlashAttribute("res","添加失败");
         }
-        model.addAttribute("goods",goods);
-        return "admin/pictureAddOrEdit";
-    }*/
+        return "redirect:pictureAdd";
+    }
 
-//    /**
-//     * 添加/修改 商品信息 - post
-//     * @param model 跳转携带信息
-//     * @param goods 商品对象
-//     * @return
-//     */
-//    @RequestMapping(value="/admin/goods_manage_add", method = RequestMethod.POST)
-//    public String addGoodsStatusPost(Model model,@ModelAttribute("goods") Goods goods, HttpSession session){
-//        try {
-//            if(goods.getGoodsType()!=1){
-//                goods.setGoodsStyle(0);
-//            }
-//            String goodsIcon = (String) session.getAttribute("goodsIcon");
-//            if (StringUtils.isEmpty(goodsIcon)){
-//                model.addAttribute("goods",goods);
-//                model.addAttribute("add_icon","请上传图片");
-//                return "admin/goods_manage_add";
-//            }
-//            goods.setGoodsIcon(goodsIcon);
-//            goodsService.addGoods(goods);
-//            session.removeAttribute("goodsIcon");
-//        } catch (Exception e) {
-//            logger.error((goods.getGoodsId()==0?"添加":"修改")+"商品信息出错", e);
-//            model.addAttribute("goods",goods);
-//            return "admin/goods_manage_add";
-//        }
-//        return "redirect:goods_manage";
-//    }
 
+    //进入图片查看页面
+    @RequestMapping(value="/admin/pictureView", method = RequestMethod.GET)
+    public String pictureEdit(Model model, int id){
+        Picture picture = pictureService.getPictureById(id);
+        model.addAttribute("picture",picture);
+        return "admin/pictureView";
+    }
 }

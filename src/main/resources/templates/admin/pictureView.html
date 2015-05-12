@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Excavator运营管理平台</title>
+    <link href="css/index.css" type="text/css" rel="stylesheet"/>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+</head>
+
+<body>
+<!--头部信息开始-->
+<div class="head" th:replace="admin/pictureManager::fragment_header">
+    <div class="head-top">
+        <div class="head-top-main">
+            <div class="logo"><img src="images/logo.png" width="77" height="29"/></div>
+            <table width="auto" cellspacing="0" cellpadding="0" border="0" align="right">
+                <tbody>
+                <tr>
+                    <td><span class="user-name">欢迎您，系统管理员</span></td>
+                    <td>&nbsp;</td>
+                    <td><span class="user-esc"><a href="#">
+                        <img type="image" name="imageField2" id="imageField2" src="images/esc.png" title="退出"/></a></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--头部信息结束-->
+<div class="main">
+<!--左侧导航开始-->
+<div class="main-left" th:replace="admin/pictureManager::leftsidebar">
+    <ul id="sub-nav">
+        <li>
+            <a href="#" class="nav-title"><img src="images/ad_gl.png" width="98" height="20" border="0"/></a>
+            <ul>
+                <li>
+                    <a href="pictureManager.html" th:href="@{pictureManager.html}">图片运营</a>
+                    <a href="pictureView.html" th:href="@{pictureView.html}" style="display: none;">查看图片</a>
+                </li>
+                <li>
+                    <a href="pictureAdd.html" th:href="@{pictureAdd.html}">添加图片</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <script>
+        /*<![CDATA[*/
+        $(function () {
+            var current_path = window.location.pathname.split('/').pop();
+            initMenu(current_path);
+            if(-1 != window.location.search.indexOf("&goType=1")){
+                $("#mediaSelect").addClass("fix");
+                $("#devSelect").removeClass("fix");
+            }else{
+                $('.main-left li a[href^="' + current_path + '"]').addClass('fix');
+            }
+        });
+        function initMenu(obj) {
+            $('#sub-nav ul').hide();
+            $('.main-left li a[href^="' + obj + '"]').parent().parent().show();
+            $('#sub-nav li a').click(
+                    function() {
+                        var checkElement = $(this).next();
+                        if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
+                            return false;
+                        }
+                        if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
+                            $('#sub-nav ul:visible').slideUp('normal');
+                            checkElement.slideDown('normal');
+                            return false;
+                        }
+                    }
+            );
+        }
+        /*]]>*/
+    </script>
+</div>
+<!--左侧导航栏结束-->
+<!--右侧信息开始-->
+<div class="main-right">
+    <div class="main-cont">
+        <table width="800" border="0" cellspacing="0" cellpadding="0" id="tb" th:object="${picture}">
+            <tr>
+                <td width="80" height="40">图片ID：</td>
+                <td width="300" height="40" align="left" th:text="*{id}">1</td>
+                <td height="40" >&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">图片标题：</td>
+                <td width="300" height="40" align="left" th:text="*{title}">1</td>
+                <td height="40" >&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">图片形式：</td>
+                <td width="300" height="40" align="left">
+                    <span th:if="*{style eq 1}">自有图片</span>
+                    <span th:if="*{style eq 2}">第三方图片</span>
+                </td>
+                <td height="40" >&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">图片分类：</td>
+                <td th:switch="*{ptype}" align="left"><!-- 图片分类 -->
+                    <span th:case="1">学生</span>
+                    <span th:case="2">模特</span>
+                    <span th:case="3">短裙</span>
+                    <span th:case="4">制服</span>
+                    <span th:case="5">蕾丝</span>
+                    <span th:case="6">街拍</span>
+                    <span th:case="7">野外</span>
+                    <span th:case="8">空姐</span>
+                    <span th:case="9">日系</span>
+                    <span th:case="10">写真</span>
+                    <span th:case="11">香肩美腿</span>
+                </td>
+                <td height="40" >&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">运行状态：</td>
+                <td width="300" height="40" align="left">
+                    <span th:if="*{status eq 1}">开启</span>
+                    <span th:if="*{status eq 0}">暂停</span>
+                </td>
+                <td height="40" >&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">权值：</td>
+                <td width="300" height="40" align="left" th:text="*{weight}"></td>
+                <td height="40" colspan="2" >&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">开始时间：</td>
+                <td width="300" height="40" align="left" th:text="*{startTime ne null?#dates.format(startTime, 'yyyy-MM-dd'):'-'}"></td>
+                <td height="40">&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">结束时间：</td>
+                <td width="300" height="40" align="left" th:text="*{endTime ne null?#dates.format(endTime, 'yyyy-MM-dd'):'-'}"></td>
+                <td height="40">&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">投放时间段：</td>
+                <td width="300" height="40" align="left" th:text="*{hour}"></td>
+                <td height="40">&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">创建时间：</td>
+                <td width="300" height="40" align="left" th:text="*{createTime ne null?#dates.format(createTime, 'yyyy-MM-dd HH:mm:ss'):'-'}"></td>
+                <td height="40">&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">更新时间：</td>
+                <td width="300" height="40" align="left" th:text="*{updateTime ne null?#dates.format(updateTime, 'yyyy-MM-dd HH:mm:ss'):'-'}"></td>
+                <td height="40">&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="80" height="40">图片地址：</td>
+                <td width="300" height="40" align="left" colspan="2">
+                    <img th:src="*{url}" src="images/date.png" width="320px" height="500px" />
+                </td>
+            </tr>
+        </table>
+    </div>
+<!--右侧信息结束-->
+</div>
+</div>
+</body>
+</html>

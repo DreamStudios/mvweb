@@ -1,0 +1,293 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Excavator运营管理平台</title>
+    <link href="css/index.css" type="text/css" rel="stylesheet"/>
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="uploadify/uploadify.css" />
+    <script src="js/jquery-1.8.0.js" type="text/javascript"></script>
+    <script src="uploadify/jquery.uploadify.js" type="text/javascript"></script>
+    <script src="My97DatePicker/WdatePicker.js" type="text/javascript" ></script>
+    <script type="text/javascript" src="js/mvweb.js"></script>
+</head>
+
+<body>
+<!--头部信息开始-->
+<div class="head" th:replace="admin/pictureManager::fragment_header">
+    <div class="head-top">
+        <div class="head-top-main">
+            <div class="logo"><img src="images/logo.png" width="77" height="29"/></div>
+            <table width="auto" cellspacing="0" cellpadding="0" border="0" align="right">
+                <tbody>
+                <tr>
+                    <td><span class="user-name">欢迎您，系统管理员</span></td>
+                    <td>&nbsp;</td>
+                    <td><span class="user-esc"><a href="#">
+                        <img type="image" name="imageField2" id="imageField2" src="images/esc.png" title="退出"/></a></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--头部信息结束-->
+<div class="main">
+<!--左侧导航开始-->
+<div class="main-left" th:replace="admin/pictureManager::leftsidebar">
+    <ul id="sub-nav">
+        <li>
+            <a href="#" class="nav-title"><img src="images/ad_gl.png" width="98" height="20" border="0"/></a>
+            <ul>
+                <li>
+                    <a href="pictureManager.html" th:href="@{pictureManager.html}">图片运营</a>
+                    <a href="pictureView.html" th:href="@{pictureView.html}" style="display: none;">查看图片</a>
+                </li>
+                <li>
+                    <a href="pictureAdd.html" th:href="@{pictureAdd.html}">添加图片</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <script>
+        /*<![CDATA[*/
+        $(function () {
+            var current_path = window.location.pathname.split('/').pop();
+            initMenu(current_path);
+            if(-1 != window.location.search.indexOf("&goType=1")){
+                $("#mediaSelect").addClass("fix");
+                $("#devSelect").removeClass("fix");
+            }else{
+                $('.main-left li a[href^="' + current_path + '"]').addClass('fix');
+            }
+        });
+        function initMenu(obj) {
+            $('#sub-nav ul').hide();
+            $('.main-left li a[href^="' + obj + '"]').parent().parent().show();
+            $('#sub-nav li a').click(
+                    function() {
+                        var checkElement = $(this).next();
+                        if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
+                            return false;
+                        }
+                        if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
+                            $('#sub-nav ul:visible').slideUp('normal');
+                            checkElement.slideDown('normal');
+                            return false;
+                        }
+                    }
+            );
+        }
+        /*]]>*/
+    </script>
+</div>
+<!--左侧导航栏结束-->
+<!--右侧信息开始-->
+<div class="main-right">
+    <div class="main-cont" style="float: left;width: 500px;">
+        <form th:object="${picture}" th:action="@{pictureAdd.html}" id="form" name="form" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="createTime" th:value="*{createTime}"/>
+            <input type="hidden" name="updateTime" th:value="*{updateTime}"/>
+            <input type="hidden" name="weight" th:value="*{weight}"/>
+            <table width="800" border="0" cellspacing="0" cellpadding="0" id="tb">
+                <tr>
+                    <td width="80" height="40">图片标题：</td>
+                    <td width="300" height="40" align="left">
+                        <input type="text" name="title" id="title" maxlength="50" th:value="*{title}"/>
+                    </td>
+                    <td height="10" >&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="80" height="40">图片形式：</td>
+                    <td width="300" height="40" align="left">
+                        <select id="style" name="style">
+                            <option value="1" th:selected="*{style eq 1}">自有图片</option>
+                            <option value="2" th:selected="*{style eq 2}">第三方图片</option>
+                        </select>
+                    </td>
+                    <td height="10" >&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="80" height="40">图片分类：</td>
+                    <td align="left"><!-- 图片分类 -->
+                        <select name="ptype" id="ptype" class="option">
+                            <option value="1" th:selected="${ptype eq 1}">学生</option>
+                            <option value="2" th:selected="${ptype eq 2}">模特</option>
+                            <option value="3" th:selected="${ptype eq 3}">短裙</option>
+                            <option value="4" th:selected="${ptype eq 4}">制服</option>
+                            <option value="5" th:selected="${ptype eq 5}">蕾丝</option>
+                            <option value="6" th:selected="${ptype eq 6}">街拍</option>
+                            <option value="7" th:selected="${ptype eq 7}">野外</option>
+                            <option value="8" th:selected="${ptype eq 8}">空姐</option>
+                            <option value="9" th:selected="${ptype eq 9}">日系</option>
+                            <option value="10" th:selected="${ptype eq 10}">写真</option>
+                            <option value="11" th:selected="${ptype eq 11}">香肩美腿</option>
+                        </select>
+                    </td>
+                    <td height="10" >&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="80" height="40">开始日期：</td>
+                    <td width="300" height="40" align="left">
+                        <input type="text" id="startTime" name="startTime" th:value="*{startTime ne null?#dates.format(startTime, 'yyyy-MM-dd'):''}" class="Wdate" readonly="readonly" maxlength="16" style="width: 110px;" onclick="WdatePicker({isShowClear:false,maxDate:'%y-%M-%d'})" onkeydown="if(window.event.keyCode == 8)window.event.keyCode = 0"/>
+                    </td>
+                    <td height="10">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="80" height="40">结束日期：</td>
+                    <td width="300" height="40" align="left">
+                        <input type="text" id="endTime" name="endTime" th:value="*{endTime ne null?#dates.format(endTime, 'yyyy-MM-dd'):''}" class="Wdate" readonly="readonly" maxlength="16" style="width: 110px;" onclick="WdatePicker({isShowClear:false,minDate:'%y-%M-%d'})"/>
+                    </td>
+                    <td height="10">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="80" height="40">投放时间段：</td>
+                    <td width="300" height="40" align="left">
+                        <input type="text" name="hour" id="hour" maxlength="50" th:value="*{hour}"/>
+                    </td>
+                    <td height="10">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="80" height="40">图片地址：</td>
+                    <td width="300" height="40" align="left" colspan="2">
+                        <div id="picturediv" th:class="*{style eq 1?'':'taghidden'}">
+                            <input id="file_upload_picture" name="file" type="file" multiple="true" />
+                        </div>
+                        <div id="text" th:class="*{style eq 2?'':'taghidden'}">
+                            <textarea id="url" name="url" th:text="*{url}"></textarea>
+                        </div>
+                        <div id="fileQueue" class="fileQueue"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="80" height="40">&nbsp;</td>
+                    <td width="100" height="40" align="left">
+                        <input type="submit" name="submit" id="button" value="提交" style="background:#34c9df;border:none;border-radius: 5px;line-height: 30px;font-size: 14px;height: 30px;width: 100px;display: block;text-align: center;color: #fff;"/>
+                    </td>
+                    <td height="10" align="left">&nbsp;</td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div class="msgdiv" id="msgdiv" style="float:left;">
+        <div class="rizhi">日志信息</div>
+        <div id="msginfo" class="content">
+
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+<!--右侧信息结束-->
+</div>
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var contexPath = /*[[${#httpServletRequest.getContextPath()}]]*/'';
+    var sessionid = /*[[${#httpSession.id}]]*/"";
+    var fileCount = 0;//文件总数
+    var processCount = 0;//已经处理文件数
+    var successCount = 0;//处理成功的文件数
+    var failCount = 0;//处理失败的文件数
+    $(function() {
+        setTimeout(function(){
+            $("#file_upload_picture").uploadify({
+                'method'   : 'post',
+                'width':100,
+                'height':30,
+                'swf' : 'uploadify/uploadify.swf',
+                'formData'      : {'sessionId' : 'mvpicture'},//传递参数
+                'fileObjName' : 'file',
+                'uploader' : contexPath+'/fileUpload;jsessionid=' + sessionid,//后台处理的请求 uploadFile
+                'queueID' : 'fileQueue',//显示位置
+                'buttonImage'  : 'images/uploadButton.png',
+                'auto': true,//是否自动上传
+                'multi':true, //是否允许多文件上传
+                'removeCompleted':true,//上传完成后队列是否自动消失
+                'queueSizeLimit': 20,//队列中最多选择文件的数量
+                'fileSizeLimit':'300K',
+                'successTimeout':99999,
+                'fileTypeDesc' : 'picture file',
+                'fileTypeExts' : '*.png;*.jpg;*.gif;',//控制可上传文件的扩展名，启用本项时需同时声明fileDesc
+                'simUploadLimit' : 5,  //并行上传文件数量
+                'buttonCursor': 'pointer',//上传鼠标hover后Cursor的形状
+                'buttonText':'浏览文件',
+                'onDialogOpen':function(){
+                    fileCount = 0;
+                    processCount = 0;
+                    successCount = 0;
+                    failCount = 0;
+                    $("#msginfo").html("");
+                },
+                'onDialogClose' : function(swfuploadifyQueue) {//当文件选择对话框关闭时触发
+                    fileCount = swfuploadifyQueue.queueLength;
+                },
+                onUploadStart:function(file){
+                    $('#file_upload_picture').uploadify('disable','1');
+                    $("#button").attr("disabled",true);
+                    processCount++;
+                    var time = formatDateTime();
+                    var info = "<div>"+processCount+"、"+time+" "+file.name+"</div>";
+                    $("#msginfo").append(info);
+                },
+                'onUploadProgress': function(file, e) {//上传过程中定时调用直到上传完成
+                    if(file.size == e){
+                        var info = "<div><span style='color: green;padding-left: 16px;'>上传成功!</span></div>";
+                        info += "<div style='padding-left: 16px;'>正在处理,请稍后...</div>";
+                        $("#msginfo").append(info);
+                    }
+                },
+                'onUploadSuccess' : function(file,data,response) {//上传完成时触发（每个文件触发一次）
+                    successCount++;
+                    var info = "<div><span style='color: green;padding-left: 16px;'>处理成功!</span></div>";
+                    if(processCount == fileCount){
+                        var success = "<span style='color: green;'>成功："+successCount+"个，</span>";
+                        var fail = "<span style='color: red;'>失败："+failCount+"个！</span>";
+                        info += "<div>统计：本次共上传"+fileCount+"个文件，"+success+fail+"</div>";
+                    }
+                    $("#msginfo").append(info);
+                },
+                'onUploadError' : function(file,errorCode,errorMsg,errorString) {//上传文件出错是触发（每个出错文件触发一次）
+                    if(errorCode !="-280"){//上传出错
+                        failCount++;
+                        var info = "<div style='color: red;padding-left: 16px;'>处理失败!<br/>错误描述:"+ errorString+"</span>";
+                        if(processCount == fileCount){
+                            var success = "<span style='color: green;'>成功："+successCount+"个，</span>";
+                            var fail = "<span style='color: red;'>失败："+failCount+"个！</span>";
+                            info += "<div>统计：本次共上传"+fileCount+"个文件，"+success+fail+"</div>";
+                        }
+                        $("#msginfo").append(info);
+                    }else{//从队列中移除
+                        fileCount--;
+                    }
+                },
+                'onQueueComplete' : function(uploads) {
+                    $('#file_upload_picture').uploadify('disable');
+                    $("#button").attr("disabled",false);
+                }
+            });
+        },10);
+        $('#style').change(function(){
+            var va = $(this).children('option:selected').val();
+            if(va == 1){
+                $("#text").hide();
+                $("#picturediv").show();
+            }else{
+                $("#text").show();
+                $("#picturediv").hide();
+            }
+        });
+    });
+    function formatDateTime(){
+        var date = new Date();
+        return date.DateFoMat("yyyy-MM-dd HH:mm:ss");
+    }
+    $(function(){
+        var res = /*[[${res==null?"":res}]]*/'';
+        if(res != ""){
+            alert(res);
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

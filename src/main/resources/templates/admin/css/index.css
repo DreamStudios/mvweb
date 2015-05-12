@@ -539,3 +539,11 @@ width:100%;
 overflow-x: auto;  /*横向滚动条(scroll:始终出现;auto:必要时出现;)*/
 overflow-y: auto; 
 }
+.taghidden{
+    display: none;
+}
+.msgdiv{width:400px;height:auto;background:#fff;border:1px solid #95B8E7;margin-top: 5px;font-size: 12px;}
+
+.rizhi{width:400px;height:33px;border-bottom:1px solid #95B8E7;background:#E0ECFF;text-align:center;font-size:14px;font-weight:600;line-height:33px;}
+
+.content{padding:10px;line-height:180%;max-height: 800px; overflow-x:hidden; overflow-y:auto;}

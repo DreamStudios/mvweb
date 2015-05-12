@@ -15,7 +15,7 @@ import java.util.Date;
 @Entity
 @Table(name = "picture")
 @NamedQuery(name = "Picture.findAll", query="SELECT a FROM Picture a")
-public class Picture implements Serializable{
+public class Picture implements Serializable,Cloneable{
 	private static final long serialVersionUID = -7269172643125918597L;
 
 	//图片实体主键
@@ -66,8 +66,8 @@ public class Picture implements Serializable{
     @Column(nullable = false)
     private Date endTime = new Date();
 
-    //投放时间段
-    @Column(nullable = false)
+    //投放时间段,为空表示所有时间都投放
+    @Column(nullable = true)
     private String hour;
 
     public int getId() {
@@ -164,5 +164,9 @@ public class Picture implements Serializable{
 
     public void setHour(String hour) {
         this.hour = hour;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

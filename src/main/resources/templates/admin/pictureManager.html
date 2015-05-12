@@ -171,7 +171,7 @@
                 <td><input type="checkbox" th:value="${page.id}" name="checkbox" /></td>
                 <td th:text="${page.id}">图片ID</td>
                 <td>
-                    <a href="pictureAddOrEdit.html" th:href="@{'pictureAddOrEdit.html?id='+${page.id}}"  th:text="${page.title}">图片标题</a>
+                    <a href="pictureView.html" th:href="@{'pictureView.html?id='+${page.id}}"  th:text="${page.title}">图片标题</a>
                 </td>
                 <td th:switch="${page.ptype}"><!-- 图片分类 -->
                     <span th:case="1">学生</span>
