@@ -28,7 +28,8 @@ public class SyncDataController {
 	 * @return
 	 */
 	@RequestMapping(value = "/admin/syncPictures")
-	public String syncSuspendPool(){
-		return "0";
+	public String syncPictures(){
+        boolean result = pictureService.syncPictures();
+        return String.valueOf(result);
 	}
 }

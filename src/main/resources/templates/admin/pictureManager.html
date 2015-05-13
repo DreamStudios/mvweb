@@ -360,7 +360,7 @@
                 },
                 success:function(data){
                     $.unblockUI();
-                    if("0"==data){
+                    if("true"==data){
                         showDiv("同步成功", 2);
                     }else{
                         showDiv("同步失败", 1);

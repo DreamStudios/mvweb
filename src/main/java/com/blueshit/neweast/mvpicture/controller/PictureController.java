@@ -36,7 +36,7 @@ public class PictureController {
         newPage = newPage == null ? 1 : newPage;
         style = style == null ? 0 : style;
         ptype = ptype == null ? 0 : ptype;
-        status = status == null ? -1 : status;
+        status = status == null ? 1 : status;
         model.addAttribute("pages", pictureService.getPicturePage(newPage,style,ptype,status));
         model.addAttribute("newPage", newPage);
         model.addAttribute("style", style);
@@ -77,7 +77,6 @@ public class PictureController {
         style = style == null ? 1 : style;
         picture.setStyle(style);
         model.addAttribute("picture",picture);
-        System.out.println("------------------");
         return "admin/pictureAdd";
     }
 

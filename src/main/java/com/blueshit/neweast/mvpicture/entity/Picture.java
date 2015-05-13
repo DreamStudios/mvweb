@@ -56,12 +56,12 @@ public class Picture implements Serializable,Cloneable{
     @Column(nullable = false)
     private int weight = 1;
 
-    //开始投放时间
+    //开始投放日期
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date startTime = new Date();
 
-    //结束投放时间
+    //结束投放日期
     @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private Date endTime = new Date();
@@ -69,6 +69,10 @@ public class Picture implements Serializable,Cloneable{
     //投放时间段,为空表示所有时间都投放
     @Column(nullable = true)
     private String hour;
+
+    //是否需要同步(1:是 0:否)
+    @Column(nullable = false, columnDefinition = "int(11) default 1")
+    private int sync = 1;
 
     public int getId() {
         return id;
@@ -168,5 +172,13 @@ public class Picture implements Serializable,Cloneable{
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    public int getSync() {
+        return sync;
+    }
+
+    public void setSync(int sync) {
+        this.sync = sync;
     }
 }

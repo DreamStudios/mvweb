@@ -2,17 +2,19 @@ package com.blueshit.neweast.mvpicture.service.impl;
 
 import com.blueshit.neweast.mvpicture.entity.Picture;
 import com.blueshit.neweast.mvpicture.service.PictureService;
+import com.blueshit.neweast.repository.PicturePoolRepository;
 import com.blueshit.neweast.repository.PictureRepository;
+import com.blueshit.neweast.repository.SyncRepository;
 import com.blueshit.neweast.utils.Constant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.blueshit.neweast.utils.DateUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * 图片管理接口实现类
@@ -24,15 +26,25 @@ import java.util.List;
  */
 @Service
 public class PictureServiceImpl implements PictureService {
-    private static final Logger logger = LoggerFactory.getLogger(PictureServiceImpl.class);
+    //资源文件地址
+    @Value("${resourceFileUrl}")
+    private String resourceFileUrl = "http://s3.xlskad.cn/admin";
 
     private PictureRepository pictureRepository;
-    @Autowired
-    public  HttpSession       httpSession;
+    private HttpSession       httpSession;
+    private SyncRepository    syncRepository;
+    private ObjectMapper      objectMapper;
+    private PicturePoolRepository picturePoolRepository;
 
     @Autowired
-    public PictureServiceImpl(PictureRepository pictureRepository) {
+    public PictureServiceImpl(PictureRepository pictureRepository, HttpSession httpSession,
+                              SyncRepository syncRepository, ObjectMapper objectMapper,
+                              PicturePoolRepository picturePoolRepository) {
         this.pictureRepository = pictureRepository;
+        this.httpSession = httpSession;
+        this.syncRepository = syncRepository;
+        this.objectMapper = objectMapper;
+        this.picturePoolRepository = picturePoolRepository;
     }
 
     /**
@@ -52,10 +64,8 @@ public class PictureServiceImpl implements PictureService {
         if (0 != ptype) {
             hql.append(" AND ptype=" + ptype);
         }
-        if (-1 != status) {
-            hql.append(" AND status=" + status);
-        }
-        hql.append(" ORDER BY status DESC,weight ASC,updateTime DESC"); //排序
+        hql.append(" AND status=" + status);
+        hql.append(" ORDER BY status DESC,ptype ASC,weight ASC,updateTime DESC"); //排序
         return pictureRepository.findByHql(hql.toString(), Constant.PAGE_SIZE, pageNo);
     }
 
@@ -65,10 +75,11 @@ public class PictureServiceImpl implements PictureService {
      * @param status 投放状态
      * @return
      */
+    @Override
     public boolean updatePictureStatus(String ids,int status){
         if(null != ids && 0 < ids.length()){
             try{
-                pictureRepository.updateByHql("UPDATE Picture set status="+status+" WHERE id IN ("+ids+")");
+                pictureRepository.updateByHql("UPDATE Picture set status="+status+",sync=1 WHERE id IN ("+ids+")");
             }catch(Exception ex){
                 return false;
             }
@@ -85,10 +96,11 @@ public class PictureServiceImpl implements PictureService {
      * @param hour 投放时间段
      * @return
      */
+    @Override
     public boolean updatePictureWeight(int id,String startTime,String endTime,int weight,String hour){
         if(null != hour && 0 < hour.length()){
             try{
-                pictureRepository.updateByHql("UPDATE Picture set startTime='"+startTime+"',endTime='"+endTime+"',weight="+weight+",hour='"+hour+"' WHERE id="+id);
+                pictureRepository.updateByHql("UPDATE Picture set startTime='"+startTime+"',endTime='"+endTime+"',weight="+weight+",hour='"+hour+"',sync=1 WHERE id="+id);
             }catch(Exception ex){
                 return false;
             }
@@ -101,6 +113,7 @@ public class PictureServiceImpl implements PictureService {
      * @param id 图片ID
      * @return
      */
+    @Override
     public Picture getPictureById(int id){
         return pictureRepository.findOne(id);
     }
@@ -110,9 +123,14 @@ public class PictureServiceImpl implements PictureService {
      * @param picture 图片对象
      * @return
      */
+    @Override
     public boolean addPicture(Picture picture){
         try {
             picture.setStatus(0);
+            picture.setSync(1);
+            if(null != picture.getHour() && !picture.getHour().isEmpty()){
+                picture.setHour(","+picture.getHour()+",");
+            }
             List<Picture> pictures = new ArrayList<Picture>();
             if (1 == picture.getStyle()) {//自有
                 Object obj = httpSession.getAttribute("pictures");
@@ -137,5 +155,65 @@ public class PictureServiceImpl implements PictureService {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 同步图片信息
+     * @return
+     */
+    @Override
+    public boolean syncPictures(){
+        String now = DateUtil.getPreAfterDate(0);
+        String hour = "," + DateUtil.getHour(new Date()) + ",";
+        StringBuffer hql = new StringBuffer("From Picture WHERE status=1 ");
+        hql.append(" AND startTime <='" + now + "'");
+        hql.append(" AND endTime >='" + now + "'");
+        hql.append(" AND (hour IS NULL OR hour='' OR hour LIKE '%" + hour + "%') ");
+        hql.append(" ORDER BY ptype ASC,weight ASC,updateTime DESC"); //排序
+        List<Picture> list = pictureRepository.whFindByList(hql.toString());
+        try{
+            syncPicture(list);
+        }catch (Exception ex){
+            return false;
+        }
+        return true;
+    }
+
+    //同步数据集合
+    private void syncPicture(List<Picture> list) throws Exception{
+        if(null != list && 0 < list.size()){
+            Map<String, String> details = new HashMap<String, String>();
+            Map<Integer,List<Integer>> pool = new HashMap<Integer, List<Integer>>();
+            for(Picture picture : list){
+                if(1 == picture.getStyle()){//自有图片
+                    picture.setUrl(resourceFileUrl+picture.getUrl());
+                }
+                if(1 == picture.getSync()){//是否需要同步
+                    details.put(picture.getId()+"",objectMapper.writeValueAsString(picture));
+                }
+                if(pool.containsKey(picture.getPtype())){
+                    pool.get(picture.getPtype()).add(picture.getId());
+                }else {
+                    List<Integer> idList = new ArrayList<Integer>();
+                    idList.add(picture.getId());
+                    pool.put(picture.getPtype(),idList);
+                }
+            }
+            //将图片详情写入redis
+            syncRepository.syncPictureDetail(details);
+            //将图片池写入redis
+            syncRepository.syncPicturePool(pool);
+            //将redis图片池信息加载到内存
+            picturePoolRepository.initPicturePool();
+        }
+    }
+
+    /**
+     * 客户端请求图片信息
+     * @param key
+     * @return
+     */
+    public String getPictures(String key){
+        return "";
     }
 }

@@ -55,4 +55,17 @@ public interface PictureService {
      * @return
      */
     public boolean addPicture(Picture picture);
+
+    /**
+     * 同步图片信息
+     * @return
+     */
+    public boolean syncPictures();
+
+    /**
+     * 客户端请求图片信息
+     * @param key
+     * @return
+     */
+    public String getPictures(String key);
 }
