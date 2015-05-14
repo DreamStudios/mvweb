@@ -41,7 +41,7 @@ public class PicturePoolRepositoryImpl implements PicturePoolRepository{
         try {
             picturePools = initPoolsByKey(Constant.RedisKey.PTYPE);
         } catch (Exception ex) {
-            logger.error("读取redis中数据出错");
+            logger.error("读取redis中数据出错",ex);
         }
     }
 
@@ -72,8 +72,26 @@ public class PicturePoolRepositoryImpl implements PicturePoolRepository{
      */
     private void initPoolByKey(Map<String, Map<Integer, List<String>>> map, String keyForPoolNum) throws Exception {
         Map<Integer, List<String>> pageMap = new HashMap<Integer, List<String>>();
-        Integer[] adids = objectMapper.readValue(stringRedisTemplate.boundValueOps(keyForPoolNum).get(), Integer[].class);
-        //TODO 将分页后的信息加入map
+        Integer[] pids = objectMapper.readValue(stringRedisTemplate.boundValueOps(keyForPoolNum).get(), Integer[].class);
+
+        int index = 1;
+        int page = 1;
+        List<String> list = new ArrayList<String>();
+        for(int i=0;i<pids.length;i++){
+            if(index < 15){//前14个
+                list.add(String.valueOf(pids[i]));
+                index++;
+            }else if(index == 15) {//第15个
+                list.add(String.valueOf(pids[i]));
+                pageMap.put(page,list);
+                index = 1;
+                page++;
+                list = new ArrayList<String>();
+            }
+            if(index <= 15 && i == pids.length - 1){//不满15个时
+                pageMap.put(page,list);
+            }
+        }
         map.put(keyForPoolNum.split(":")[1],pageMap);
     }
 
@@ -89,5 +107,15 @@ public class PicturePoolRepositoryImpl implements PicturePoolRepository{
             initPicturePool();
         }
         return picturePools.get(ptype).get(page);
+    }
+
+    /**
+     * 通过ID获取Redis中的广告信息
+     * @param id
+     * @return
+     */
+    @Override
+    public String getPictureById(String id){
+        return stringRedisTemplate.boundHashOps(Constant.RedisKey.PICTURE).get(id).toString();
     }
 }

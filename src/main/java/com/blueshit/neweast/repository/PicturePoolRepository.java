@@ -23,4 +23,11 @@ public interface PicturePoolRepository {
      * @return
      */
     public List<String> getPicturePool(String ptype,int page);
+
+    /**
+     * 通过ID获取Redis中的广告信息
+     * @param id
+     * @return
+     */
+    public String getPictureById(String id);
 }

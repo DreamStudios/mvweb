@@ -67,5 +67,5 @@ public interface PictureService {
      * @param key
      * @return
      */
-    public String getPictures(String key);
+    public String getPictures(String key) throws Exception;
 }

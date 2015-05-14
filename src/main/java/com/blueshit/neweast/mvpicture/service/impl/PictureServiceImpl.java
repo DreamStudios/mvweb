@@ -1,5 +1,8 @@
 package com.blueshit.neweast.mvpicture.service.impl;
 
+import com.blueshit.neweast.mvpicture.bean.ImageData;
+import com.blueshit.neweast.mvpicture.bean.PicturePool;
+import com.blueshit.neweast.mvpicture.bean.PictureRequest;
 import com.blueshit.neweast.mvpicture.entity.Picture;
 import com.blueshit.neweast.mvpicture.service.PictureService;
 import com.blueshit.neweast.repository.PicturePoolRepository;
@@ -7,6 +10,7 @@ import com.blueshit.neweast.repository.PictureRepository;
 import com.blueshit.neweast.repository.SyncRepository;
 import com.blueshit.neweast.utils.Constant;
 import com.blueshit.neweast.utils.DateUtil;
+import com.blueshit.neweast.utils.DesUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -186,10 +191,13 @@ public class PictureServiceImpl implements PictureService {
             Map<Integer,List<Integer>> pool = new HashMap<Integer, List<Integer>>();
             for(Picture picture : list){
                 if(1 == picture.getStyle()){//自有图片
-                    picture.setUrl(resourceFileUrl+picture.getUrl());
+                    picture.setUrl(resourceFileUrl + picture.getUrl());
                 }
                 if(1 == picture.getSync()){//是否需要同步
-                    details.put(picture.getId()+"",objectMapper.writeValueAsString(picture));
+                    ImageData imageData = new ImageData();
+                    imageData.setId(picture.getId());
+                    imageData.setDownload_url(picture.getUrl());
+                    details.put(picture.getId()+"",objectMapper.writeValueAsString(imageData));
                 }
                 if(pool.containsKey(picture.getPtype())){
                     pool.get(picture.getPtype()).add(picture.getId());
@@ -213,7 +221,16 @@ public class PictureServiceImpl implements PictureService {
      * @param key
      * @return
      */
-    public String getPictures(String key){
-        return "";
+    public String getPictures(String key) throws Exception{
+        PicturePool picturePool = new PicturePool();
+        String val = DesUtil.decrypt(key, Constant.DECRYPTKEY);
+        PictureRequest pictureRequest = objectMapper.readValue(val, PictureRequest.class);
+        List<String> idList = picturePoolRepository.getPicturePool(pictureRequest.getPtype(),pictureRequest.getPage());
+        if(null != idList) {
+            for (String id : idList) {
+                picturePool.getData().add(objectMapper.readValue(picturePoolRepository.getPictureById(id),ImageData.class));
+            }
+        }
+        return objectMapper.writeValueAsString(picturePool);
     }
 }

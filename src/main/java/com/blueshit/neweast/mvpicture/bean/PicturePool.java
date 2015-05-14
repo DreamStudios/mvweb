@@ -1,5 +1,6 @@
-package com.blueshit.neweast.mvpicture.entity;
+package com.blueshit.neweast.mvpicture.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,13 +13,13 @@ import java.util.List;
  */
 public class PicturePool {
 
-    private List<PictureClient> data;
+    private List<ImageData> data = new ArrayList<ImageData>();
 
-    public List<PictureClient> getData() {
+    public List<ImageData> getData() {
         return data;
     }
 
-    public void setData(List<PictureClient> data) {
+    public void setData(List<ImageData> data) {
         this.data = data;
     }
 }

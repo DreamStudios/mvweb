@@ -20,7 +20,9 @@ public class PicturePoolController {
      * @param key 客户端key
      * @return
      */
-    public String getPictrues(String key){
+    @RequestMapping("/getPictures")
+    public String getPictrues(String key) throws Exception{
+        System.out.println(123);
         return pictureService.getPictures(key);
     }
 }
