@@ -1,12 +1,8 @@
 package com.blueshit.neweast.utils;
 
-import com.blueshit.neweast.mvpicture.bean.PictureRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.net.URLEncoder;
 
 /**
  * @author JackJun
@@ -62,15 +58,5 @@ public class DesUtil {
         encryptCipher.init(Cipher.ENCRYPT_MODE, key, zeroIv);
         byte[] encryptedData = encryptCipher.doFinal(encryptString.getBytes(Constant.Common.URLENC));
         return Base64.encodeToString(encryptedData, true);
-    }
-
-    public static void main(String[] args) throws Exception {
-        PictureRequest pictureRequest = new PictureRequest();
-        pictureRequest.setPtype("1");
-        pictureRequest.setPage(1);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String s = objectMapper.writeValueAsString(pictureRequest);
-        String pwd = DesUtil.encryptDES(s,Constant.DECRYPTKEY);
-        System.out.println(URLEncoder.encode(pwd,"UTF-8"));
     }
 }

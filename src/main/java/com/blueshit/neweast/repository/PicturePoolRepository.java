@@ -22,7 +22,7 @@ public interface PicturePoolRepository {
      * @param page 页码
      * @return
      */
-    public List<String> getPicturePool(String ptype,int page);
+    public List<String> getPicturePool(String ptype);
 
     /**
      * 通过ID获取Redis中的广告信息

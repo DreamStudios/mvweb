@@ -23,10 +23,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         syncPicturePool();
     }
 
-    @Scheduled(cron = "0 0/30 * * * ?")   //每30分钟一次
+    @Scheduled(cron = "0 0 0/1 * * ?") //每小时执行一次
     @Override
     public void syncPicturePool() {
         pictureService.syncPictures();
     }
-
 }

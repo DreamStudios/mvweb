@@ -22,7 +22,9 @@ public class PicturePoolController {
      */
     @RequestMapping("/getPictures")
     public String getPictrues(String key) throws Exception{
-        System.out.println(123);
+        /*System.out.println(result);
+        result = DesUtil.decrypt(result,"52711966");
+        System.out.println(result);*/
         return pictureService.getPictures(key);
     }
 }

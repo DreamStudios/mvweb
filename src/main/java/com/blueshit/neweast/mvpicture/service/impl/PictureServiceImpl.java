@@ -2,7 +2,6 @@ package com.blueshit.neweast.mvpicture.service.impl;
 
 import com.blueshit.neweast.mvpicture.bean.ImageData;
 import com.blueshit.neweast.mvpicture.bean.PicturePool;
-import com.blueshit.neweast.mvpicture.bean.PictureRequest;
 import com.blueshit.neweast.mvpicture.entity.Picture;
 import com.blueshit.neweast.mvpicture.service.PictureService;
 import com.blueshit.neweast.repository.PicturePoolRepository;
@@ -18,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -223,14 +221,15 @@ public class PictureServiceImpl implements PictureService {
      */
     public String getPictures(String key) throws Exception{
         PicturePool picturePool = new PicturePool();
+        //解密出图片类型
         String val = DesUtil.decrypt(key, Constant.DECRYPTKEY);
-        PictureRequest pictureRequest = objectMapper.readValue(val, PictureRequest.class);
-        List<String> idList = picturePoolRepository.getPicturePool(pictureRequest.getPtype(),pictureRequest.getPage());
+        List<String> idList = picturePoolRepository.getPicturePool(val);
         if(null != idList) {
             for (String id : idList) {
                 picturePool.getData().add(objectMapper.readValue(picturePoolRepository.getPictureById(id),ImageData.class));
             }
         }
-        return objectMapper.writeValueAsString(picturePool);
+        //将反馈信息加密
+        return DesUtil.encryptDES(objectMapper.writeValueAsString(picturePool),Constant.DECRYPTKEY);
     }
 }

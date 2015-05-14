@@ -23,9 +23,8 @@ import java.util.*;
 public class PicturePoolRepositoryImpl implements PicturePoolRepository{
     private static final Logger logger = LoggerFactory.getLogger(PicturePoolRepositoryImpl.class);
 
-    //结构：外层map,键为ptype 值为ptype下的所有值。
-    //内层map,键为页码,值为该页的所有图片ID
-    private Map<String, Map<Integer, List<String>>> picturePools;
+    //结构：键为ptype 值为ptype下的所有值。
+    private Map<String, List<String>> picturePools;
 
     private StringRedisTemplate stringRedisTemplate;
     private ObjectMapper        objectMapper;
@@ -52,8 +51,8 @@ public class PicturePoolRepositoryImpl implements PicturePoolRepository{
      * @return
      * @throws Exception
      */
-    private Map<String, Map<Integer, List<String>>> initPoolsByKey(String keyForPool) throws Exception {
-        Map<String, Map<Integer, List<String>>> map = new HashMap<String, Map<Integer, List<String>>>();
+    private Map<String,List<String>> initPoolsByKey(String keyForPool) throws Exception {
+        Map<String, List<String>> map = new HashMap<String,List<String>>();
 
         Iterator<String> iterator = stringRedisTemplate.keys(keyForPool + "*").iterator();
         while (iterator.hasNext()) {
@@ -70,43 +69,26 @@ public class PicturePoolRepositoryImpl implements PicturePoolRepository{
      * @param keyForPoolNum
      * @throws Exception
      */
-    private void initPoolByKey(Map<String, Map<Integer, List<String>>> map, String keyForPoolNum) throws Exception {
-        Map<Integer, List<String>> pageMap = new HashMap<Integer, List<String>>();
+    private void initPoolByKey(Map<String, List<String>> map, String keyForPoolNum) throws Exception {
         Integer[] pids = objectMapper.readValue(stringRedisTemplate.boundValueOps(keyForPoolNum).get(), Integer[].class);
-
-        int index = 1;
-        int page = 1;
         List<String> list = new ArrayList<String>();
-        for(int i=0;i<pids.length;i++){
-            if(index < 15){//前14个
-                list.add(String.valueOf(pids[i]));
-                index++;
-            }else if(index == 15) {//第15个
-                list.add(String.valueOf(pids[i]));
-                pageMap.put(page,list);
-                index = 1;
-                page++;
-                list = new ArrayList<String>();
-            }
-            if(index <= 15 && i == pids.length - 1){//不满15个时
-                pageMap.put(page,list);
-            }
+        for(Integer pid : pids){
+            list.add(String.valueOf(pid));
         }
-        map.put(keyForPoolNum.split(":")[1],pageMap);
+        map.put(keyForPoolNum.split(":")[1],list);
     }
 
     /**
      * 获取图片池列表
      * @param ptype 图片分类
-     * @param page 页码
      * @return
      */
     @Override
-    public List<String> getPicturePool(String ptype,int page){
+    public List<String> getPicturePool(String ptype){
         if(null == picturePools){
             initPicturePool();
         }
-        return picturePools.get(ptype).get(page);
+        return picturePools.get(ptype);
     }
 
     /**
