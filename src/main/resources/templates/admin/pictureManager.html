@@ -174,17 +174,9 @@
                     <a href="pictureView.html" th:href="@{'pictureView.html?id='+${page.id}}"  th:text="${page.title}">图片标题</a>
                 </td>
                 <td th:switch="${page.ptype}"><!-- 图片分类 -->
-                    <span th:case="1">学生</span>
-                    <span th:case="2">模特</span>
-                    <span th:case="3">短裙</span>
-                    <span th:case="4">制服</span>
-                    <span th:case="5">蕾丝</span>
-                    <span th:case="6">街拍</span>
-                    <span th:case="7">野外</span>
-                    <span th:case="8">空姐</span>
-                    <span th:case="9">日系</span>
-                    <span th:case="10">写真</span>
-                    <span th:case="11">香肩美腿</span>
+                    <span th:case="5">明星</span>
+                    <span th:case="6">日系</span>
+                    <span th:case="7">街拍</span>
                 </td>
                 <td>
                     <span th:if="${page.status eq 1}" style="color: green;">开启</span>

@@ -19,7 +19,6 @@ public interface PicturePoolRepository {
     /**
      * 获取图片池列表
      * @param ptype 图片分类
-     * @param page 页码
      * @return
      */
     public List<String> getPicturePool(String ptype);
