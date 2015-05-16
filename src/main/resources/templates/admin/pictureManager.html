@@ -174,9 +174,7 @@
                     <a href="pictureView.html" th:href="@{'pictureView.html?id='+${page.id}}"  th:text="${page.title}">图片标题</a>
                 </td>
                 <td th:switch="${page.ptype}"><!-- 图片分类 -->
-                    <span th:case="5">明星</span>
-                    <span th:case="6">日系</span>
-                    <span th:case="7">街拍</span>
+                    <span th:case="10">看世界</span>
                 </td>
                 <td>
                     <span th:if="${page.status eq 1}" style="color: green;">开启</span>
