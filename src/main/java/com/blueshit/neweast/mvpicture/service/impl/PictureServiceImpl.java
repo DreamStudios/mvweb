@@ -11,6 +11,8 @@ import com.blueshit.neweast.utils.Constant;
 import com.blueshit.neweast.utils.DateUtil;
 import com.blueshit.neweast.utils.DesUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -29,14 +31,15 @@ import java.util.*;
  */
 @Service
 public class PictureServiceImpl implements PictureService {
+    private static final Logger logger          = LoggerFactory.getLogger(PictureServiceImpl.class);
     //资源文件地址
     @Value("${resourceFileUrl}")
-    private String resourceFileUrl = "http://www.xiaoujia.com/mvweb";
+    private              String resourceFileUrl = "http://www.xiaoujia.com/mvweb";
 
-    private PictureRepository pictureRepository;
-    private HttpSession       httpSession;
-    private SyncRepository    syncRepository;
-    private ObjectMapper      objectMapper;
+    private PictureRepository     pictureRepository;
+    private HttpSession           httpSession;
+    private SyncRepository        syncRepository;
+    private ObjectMapper          objectMapper;
     private PicturePoolRepository picturePoolRepository;
 
     @Autowired
@@ -67,7 +70,9 @@ public class PictureServiceImpl implements PictureService {
         if (0 != ptype) {
             hql.append(" AND ptype=" + ptype);
         }
-        hql.append(" AND status=" + status);
+        if (-1 != status) {
+            hql.append(" AND status=" + status);
+        }
         hql.append(" ORDER BY status DESC,ptype ASC,weight ASC,updateTime DESC"); //排序
         return pictureRepository.findByHql(hql.toString(), Constant.PAGE_SIZE, pageNo);
     }
@@ -84,6 +89,7 @@ public class PictureServiceImpl implements PictureService {
             try{
                 pictureRepository.updateByHql("UPDATE Picture set status="+status+",sync=1 WHERE id IN ("+ids+")");
             }catch(Exception ex){
+                logger.error("修改图片状态失败：",ex);
                 return false;
             }
         }
@@ -105,6 +111,7 @@ public class PictureServiceImpl implements PictureService {
             try{
                 pictureRepository.updateByHql("UPDATE Picture set startTime='"+startTime+"',endTime='"+endTime+"',weight="+weight+",hour='"+hour+"',sync=1 WHERE id="+id);
             }catch(Exception ex){
+                logger.error("修改图片权重失败：",ex);
                 return false;
             }
         }
@@ -155,6 +162,7 @@ public class PictureServiceImpl implements PictureService {
             }
             pictureRepository.save(pictures);
         }catch (Exception ex){
+            logger.error("添加图片失败：",ex);
             return false;
         }
         return true;
@@ -177,6 +185,7 @@ public class PictureServiceImpl implements PictureService {
         try{
             syncPicture(list);
         }catch (Exception ex){
+            logger.error("同步图片失败：",ex);
             return false;
         }
         return true;
@@ -187,6 +196,7 @@ public class PictureServiceImpl implements PictureService {
         if(null != list && 0 < list.size()){
             Map<String, String> details = new HashMap<String, String>();
             Map<Integer,List<Integer>> pool = new HashMap<Integer, List<Integer>>();
+            List<Picture> plist = new ArrayList<Picture>();
             for(Picture picture : list){
                 if(1 == picture.getStyle()){//自有图片
                     picture.setUrl(resourceFileUrl + picture.getUrl());
@@ -196,6 +206,8 @@ public class PictureServiceImpl implements PictureService {
                     imageData.setId(picture.getId());
                     imageData.setDownload_url(picture.getUrl());
                     details.put(picture.getId()+"",objectMapper.writeValueAsString(imageData));
+                    picture.setSync(0);
+                    plist.add(picture);
                 }
                 if(pool.containsKey(picture.getPtype())){
                     pool.get(picture.getPtype()).add(picture.getId());
@@ -211,6 +223,9 @@ public class PictureServiceImpl implements PictureService {
             syncRepository.syncPicturePool(pool);
             //将redis图片池信息加载到内存
             picturePoolRepository.initPicturePool();
+            if(plist.size()>0){
+                pictureRepository.save(plist);
+            }
         }
     }
 

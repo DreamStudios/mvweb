@@ -12,10 +12,8 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 文件上传工具类
@@ -45,7 +43,7 @@ public class FileUploadController {
 
     //mn图片上传
     private void mvPictureUpload(String realPath,MultipartFile file,HttpSession session) throws Exception{
-        String name = UUID.randomUUID().toString().replace("-","");
+        String name = System.currentTimeMillis() + "_" + (int)(Math.random()*100);
         String childDir = "/mvpicture/";
         //扩展名
         String suffix = file.getOriginalFilename();

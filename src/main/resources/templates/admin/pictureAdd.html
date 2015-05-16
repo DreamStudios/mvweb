@@ -193,8 +193,8 @@
                 'auto': true,//是否自动上传
                 'multi':true, //是否允许多文件上传
                 'removeCompleted':true,//上传完成后队列是否自动消失
-                'queueSizeLimit': 20,//队列中最多选择文件的数量
-                'fileSizeLimit':'300K',
+                'queueSizeLimit': 100,//队列中最多选择文件的数量
+                'fileSizeLimit':'1024K',
                 'successTimeout':99999,
                 'fileTypeDesc' : 'picture file',
                 'fileTypeExts' : '*.png;*.jpg;*.gif;',//控制可上传文件的扩展名，启用本项时需同时声明fileDesc
@@ -275,6 +275,9 @@
         var res = /*[[${res==null?"":res}]]*/'';
         if(res != ""){
             alert(res);
+            if(res.indexOf("成功")>0){
+                window.location.href="pictureManager.html";
+            }
         }
     });
     /*]]>*/

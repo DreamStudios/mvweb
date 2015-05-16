@@ -1,5 +1,4 @@
 package com.blueshit.neweast;
-
 import com.blueshit.neweast.repository.MvWebBaseRepositoryFactoryBean;
 import org.apache.catalina.connector.Connector;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
@@ -9,7 +8,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
