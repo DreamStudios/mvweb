@@ -32,7 +32,7 @@ public class Picture implements Serializable,Cloneable{
     @Column(nullable = false, columnDefinition = "int(11) default 1")
     private int style;
 
-    //图片分类(10看世界)
+    //图片分类(10：柔美)
     @Column(nullable = false)
     private int ptype;
 

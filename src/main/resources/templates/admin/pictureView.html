@@ -103,7 +103,7 @@
             <tr>
                 <td width="80" height="40">图片分类：</td>
                 <td th:switch="*{ptype}" align="left"><!-- 图片分类 -->
-                    <span th:case="10">看世界</span>
+                    <span th:case="10">柔美</span>
                 </td>
                 <td height="40" >&nbsp;</td>
             </tr>
@@ -132,7 +132,7 @@
             </tr>
             <tr>
                 <td width="80" height="40">投放时间段：</td>
-                <td width="300" height="40" align="left" th:text="*{hour}"></td>
+                <td width="300" height="40" align="left" th:text="*{hour eq null || hour eq ''?'全天':hour}"></td>
                 <td height="40">&nbsp;</td>
             </tr>
             <tr>

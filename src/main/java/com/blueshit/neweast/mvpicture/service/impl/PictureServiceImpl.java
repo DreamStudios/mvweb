@@ -31,7 +31,7 @@ import java.util.*;
 public class PictureServiceImpl implements PictureService {
     //资源文件地址
     @Value("${resourceFileUrl}")
-    private String resourceFileUrl = "http://s3.xlskad.cn/admin";
+    private String resourceFileUrl = "http://www.xiaoujia.com/mvweb";
 
     private PictureRepository pictureRepository;
     private HttpSession       httpSession;

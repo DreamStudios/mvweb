@@ -110,17 +110,7 @@
                     <td width="100">图片分类：
                         <select name="ptype" id="ptype" class="option">
                             <option value="0" th:selected="${ptype eq 0}">全部</option>
-                            <option value="1" th:selected="${ptype eq 1}">学生</option>
-                            <option value="2" th:selected="${ptype eq 2}">模特</option>
-                            <option value="3" th:selected="${ptype eq 3}">短裙</option>
-                            <option value="4" th:selected="${ptype eq 4}">制服</option>
-                            <option value="5" th:selected="${ptype eq 5}">蕾丝</option>
-                            <option value="6" th:selected="${ptype eq 6}">街拍</option>
-                            <option value="7" th:selected="${ptype eq 7}">野外</option>
-                            <option value="8" th:selected="${ptype eq 8}">空姐</option>
-                            <option value="9" th:selected="${ptype eq 9}">日系</option>
-                            <option value="10" th:selected="${ptype eq 10}">写真</option>
-                            <option value="11" th:selected="${ptype eq 11}">香肩美腿</option>
+                            <option value="10" th:selected="${ptype eq 10}">柔美</option>
                         </select>
                     </td>
                     <td width="100">状态：
@@ -169,12 +159,14 @@
             </tr>
             <tr th:each="page,stats : ${pages}" th:style="${stats.odd?'background-color: #e4e9ee;':''}">
                 <td><input type="checkbox" th:value="${page.id}" name="checkbox" /></td>
-                <td th:text="${page.id}">图片ID</td>
+                <td>
+                    <a href="pictureView.html" th:href="@{'pictureView.html?id='+${page.id}}"  th:text="${page.id}">图片ID</a>
+                </td>
                 <td>
                     <a href="pictureView.html" th:href="@{'pictureView.html?id='+${page.id}}"  th:text="${page.title}">图片标题</a>
                 </td>
                 <td th:switch="${page.ptype}"><!-- 图片分类 -->
-                    <span th:case="10">看世界</span>
+                    <span th:case="10">柔美</span>
                 </td>
                 <td>
                     <span th:if="${page.status eq 1}" style="color: green;">开启</span>

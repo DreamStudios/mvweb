@@ -45,7 +45,7 @@ public class Application extends SpringBootServletInitializer {
         StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
         encryptor.setPassword("password");
         System.out.println("数据库密码:root 加密后是：ENC(" + encryptor.encrypt("root") + ")");
-        System.out.println("数据库密码:123456 加密后是：ENC(" + encryptor.encrypt("123456") + ")");
+        System.out.println("数据库密码:admin!@#456 加密后是：ENC(" + encryptor.encrypt("admin!@#456") + ")");
         return "就不告诉你！";
     }
 
