@@ -197,7 +197,8 @@ public class PictureServiceImpl implements PictureService {
             Map<String, String> details = new HashMap<String, String>();
             Map<Integer,List<Integer>> pool = new HashMap<Integer, List<Integer>>();
             List<Picture> plist = new ArrayList<Picture>();
-            for(Picture picture : list){
+            for(Picture picture2 : list){
+                Picture picture = (Picture)picture2.clone();
                 if(1 == picture.getStyle()){//自有图片
                     picture.setUrl(resourceFileUrl + picture.getUrl());
                 }
@@ -206,8 +207,8 @@ public class PictureServiceImpl implements PictureService {
                     imageData.setId(picture.getId());
                     imageData.setDownload_url(picture.getUrl());
                     details.put(picture.getId()+"",objectMapper.writeValueAsString(imageData));
-                    picture.setSync(0);
-                    plist.add(picture);
+                    picture2.setSync(0);
+                    plist.add(picture2);
                 }
                 if(pool.containsKey(picture.getPtype())){
                     pool.get(picture.getPtype()).add(picture.getId());
