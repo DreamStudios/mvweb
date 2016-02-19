@@ -27,7 +27,7 @@ war {
 //    webXml = file('src/main/production/web.xml') // copies a file to WEB-INF/web.xml
 }
 processResources {
-    exclude "*.*";
+    //exclude "*.*";
 }
 
 sourceCompatibility = 1.6
